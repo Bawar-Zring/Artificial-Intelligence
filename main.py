@@ -4,10 +4,13 @@ import mediapipe
 import pyautogui
 import time
 
-capture_hands = mediapipe.solutions.hands.Hands()
+from scipy.optimize import brent
+
+capture_hands = mediapipe.solutions.hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
 screen_width, screen_height = pyautogui.size()
 camera = cv2.VideoCapture(0)
 
+last_scroll_time = time.time()
 prev_time = 0
 
 while True:
@@ -70,6 +73,10 @@ while True:
 
     key = cv2.waitKey(100)
     if key == ord('q'):
+        break
+
+    if cv2.getWindowProperty('Hand Movement Video', cv2.WND_PROP_VISIBLE) < 1:
+        close_window = True
         break
 
 camera.release()
