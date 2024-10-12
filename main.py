@@ -76,7 +76,6 @@ while True:
         break
 
     if cv2.getWindowProperty('Hand Movement Video', cv2.WND_PROP_VISIBLE) < 1:
-        close_window = True
         break
 
 camera.release()
