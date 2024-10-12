@@ -4,14 +4,16 @@ import mediapipe
 import pyautogui
 import time
 
-from scipy.optimize import brent
-
-capture_hands = mediapipe.solutions.hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
+capture_hands = mediapipe.solutions.hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.7)
 screen_width, screen_height = pyautogui.size()
 camera = cv2.VideoCapture(0)
 
 last_scroll_time = time.time()
 prev_time = 0
+
+# Initialize previous mouse coordinates
+prev_mouse_x, prev_mouse_y = 0, 0
+alpha = 0.2  # Smoothing factor
 
 while True:
     _, image = camera.read()
@@ -34,9 +36,13 @@ while True:
                 y = int(lm.y * image_height)
 
                 if id == 0:
+                    # Apply smoothing
                     mouse_x = int(screen_width / screen_width * x)
                     mouse_y = int(screen_height / screen_height * y)
-                    pyautogui.moveTo(mouse_x * 3, mouse_y * 3)
+                    smoothed_mouse_x = int(alpha * mouse_x + (1 - alpha) * prev_mouse_x)
+                    smoothed_mouse_y = int(alpha * mouse_y + (1 - alpha) * prev_mouse_y)
+                    pyautogui.moveTo(smoothed_mouse_x * 3, smoothed_mouse_y * 3)
+                    prev_mouse_x, prev_mouse_y = smoothed_mouse_x, smoothed_mouse_y
 
                 if id == 8:  # index finger
                     x_index, y_index = x, y
